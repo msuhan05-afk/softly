@@ -26,8 +26,23 @@ export default function OrderSuccess() {
       <p className="text-5xl">🍯</p>
       <h1 className="mt-4 font-display text-4xl sm:text-5xl">Your honey is on its way.</h1>
       <p className="mt-3 text-charcoal-mute">
-        Thank you{order ? `, ${order.customer.name.split(" ")[0]}` : ""}! We&apos;ve received
-        your order and the Buzzora team will confirm it shortly.
+        {order?.status === "paid" ? (
+          <>
+            Thank you{order ? `, ${order.customer.name.split(" ")[0]}` : ""}! Your payment was
+            received and your order is confirmed.
+          </>
+        ) : order?.paymentMethod === "whatsapp" ? (
+          <>
+            Thank you{order ? `, ${order.customer.name.split(" ")[0]}` : ""}! Your order is
+            ready in WhatsApp — send us the message to confirm and we&apos;ll arrange payment
+            and delivery. Didn&apos;t see WhatsApp open? Your order is saved below.
+          </>
+        ) : (
+          <>
+            Thank you{order ? `, ${order.customer.name.split(" ")[0]}` : ""}! We&apos;ve
+            received your order and the Buzzora team will confirm it shortly.
+          </>
+        )}
       </p>
 
       {orderId && (

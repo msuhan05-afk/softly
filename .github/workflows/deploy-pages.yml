@@ -30,6 +30,10 @@ jobs:
           NEXT_EXPORT: "1"
           NEXT_PUBLIC_BASE_PATH: /softly
           NEXT_PUBLIC_SITE_URL: https://msuhan05-afk.github.io/softly
+          # Set these as repo Variables (Settings → Secrets and variables →
+          # Actions → Variables) to turn on WhatsApp orders + support button.
+          NEXT_PUBLIC_WHATSAPP_NUMBER: ${{ vars.WHATSAPP_NUMBER }}
+          NEXT_PUBLIC_CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
       # Publish the static export to the gh-pages branch. Creating this
       # branch auto-enables GitHub Pages (branch source) on the repo.
       - run: |

@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/CartContext";
 import { formatPrice } from "@/lib/products";
+import { buildOrder, orderToWhatsAppText, whatsAppUrl, orderMailto } from "@/lib/order";
+import { payWithRazorpay } from "@/lib/razorpay-client";
 
 const fields = [
   { name: "name", label: "Full name", autoComplete: "name", span: 2 },
@@ -16,6 +18,14 @@ const fields = [
   { name: "postcode", label: "Postcode", autoComplete: "postal-code" },
   { name: "country", label: "Country", autoComplete: "country-name" },
 ];
+
+// Checkout adapts to what's configured:
+// - Razorpay online payment when NEXT_PUBLIC_PAYMENT_PROVIDER=razorpay
+// - WhatsApp order when NEXT_PUBLIC_WHATSAPP_NUMBER is set (works on static hosting)
+// - email/manual confirmation otherwise
+const RAZORPAY = process.env.NEXT_PUBLIC_PAYMENT_PROVIDER === "razorpay";
+const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
 
 export default function CheckoutForm() {
   const { items, subtotal, clearCart } = useCart();
@@ -36,60 +46,54 @@ export default function CheckoutForm() {
     );
   }
 
-  // On static hosting (GitHub Pages) there is no orders API — build the order
-  // client-side from the catalogue so the flow still completes. The server
-  // route remains the source of truth wherever it exists.
-  const buildLocalOrder = () => ({
-    id: `BZ-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
-    status: "pending-confirmation",
-    customer: { name: customer.name.trim(), email: customer.email.trim() },
-    lines: items.map((i) => ({
-      name: i.product.name,
-      weight: i.size.weight,
-      sku: i.size.sku,
-      qty: i.qty,
-      unitPrice: i.size.price,
-      lineTotal: i.lineTotal,
-    })),
-    subtotal,
-    shipping: 0,
-    total: subtotal,
-    createdAt: new Date().toISOString(),
-  });
+  const cartPayload = items.map(({ productId, sizeSku, qty }) => ({ productId, sizeSku, qty }));
 
-  const onSubmit = async (e) => {
+  const requireForm = (form) => {
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return false;
+    }
+    return true;
+  };
+
+  const finish = (order) => {
+    sessionStorage.setItem(
+      "buzzora-last-order",
+      JSON.stringify({ ...order, shippingAddress: customer })
+    );
+    clearCart();
+    router.push(`/order-success?order=${order.id}`);
+  };
+
+  // --- WhatsApp / email / manual order ---------------------------------------
+  const placeManualOrder = (e) => {
     e.preventDefault();
+    const form = e.currentTarget.closest("form");
+    if (!requireForm(form)) return;
+    setSubmitting(true);
+    setError(null);
+    const order = buildOrder(cartPayload, customer, {
+      paymentMethod: WHATSAPP ? "whatsapp" : "manual",
+    });
+    if (WHATSAPP) {
+      const url = whatsAppUrl(WHATSAPP, orderToWhatsAppText(order, customer));
+      window.open(url, "_blank", "noopener");
+    } else if (CONTACT_EMAIL) {
+      window.location.href = orderMailto(CONTACT_EMAIL, order, customer);
+    }
+    finish(order);
+  };
+
+  // --- Razorpay online payment -----------------------------------------------
+  const payOnline = async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget.closest("form");
+    if (!requireForm(form)) return;
     setSubmitting(true);
     setError(null);
     try {
-      let data;
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/api/orders`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            customer,
-            items: items.map(({ productId, sizeSku, qty }) => ({ productId, sizeSku, qty })),
-          }),
-        });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          if (res.status === 400) throw new Error(err.error || "Something went wrong");
-          data = { order: buildLocalOrder() };
-        } else {
-          data = await res.json();
-        }
-      } catch (netErr) {
-        if (netErr.message && !/fetch|network|json/i.test(netErr.message)) throw netErr;
-        data = { order: buildLocalOrder() };
-      }
-      // Keep the confirmation details for /order-success (client-side only).
-      sessionStorage.setItem(
-        "buzzora-last-order",
-        JSON.stringify({ ...data.order, shippingAddress: customer })
-      );
-      clearCart();
-      router.push(`/order-success?order=${data.order.id}`);
+      const order = await payWithRazorpay({ items: cartPayload, customer });
+      finish(order);
     } catch (err) {
       setError(err.message);
       setSubmitting(false);
@@ -97,7 +101,7 @@ export default function CheckoutForm() {
   };
 
   return (
-    <form onSubmit={onSubmit} className="mt-8 grid gap-8 lg:grid-cols-5">
+    <form className="mt-8 grid gap-8 lg:grid-cols-5" onSubmit={(e) => e.preventDefault()}>
       <div className="lg:col-span-3">
         <div className="rounded-4xl border border-charcoal/10 bg-white p-6 sm:p-8">
           <h2 className="font-display text-2xl">Shipping details</h2>
@@ -122,9 +126,11 @@ export default function CheckoutForm() {
         <div className="mt-4 rounded-4xl border border-charcoal/10 bg-white p-6 sm:p-8">
           <h2 className="font-display text-2xl">Payment</h2>
           <p className="mt-3 text-sm leading-relaxed text-charcoal-mute">
-            Online payment is being set up. For now, orders are confirmed by the Buzzora team
-            after you place them — we&apos;ll reach out on the phone number or email you
-            provide to arrange payment and delivery.
+            {RAZORPAY
+              ? "Pay securely online with cards, UPI or netbanking. Your payment is confirmed instantly and verified on our side."
+              : WHATSAPP
+                ? "Place your order and it opens in WhatsApp, pre-filled and ready to send to us. We'll confirm payment (UPI / bank transfer / cash on delivery) and delivery directly with you."
+                : "Place your order and the Buzzora team will reach out on your phone or email to arrange payment and delivery."}
           </p>
         </div>
       </div>
@@ -149,19 +155,35 @@ export default function CheckoutForm() {
             </div>
             <div className="flex justify-between">
               <span className="text-charcoal-mute">Shipping</span>
-              <span>Confirmed with order</span>
+              <span>{RAZORPAY ? "Free" : "Confirmed with order"}</span>
             </div>
             <div className="flex justify-between border-t border-charcoal/10 pt-3 font-display text-xl">
               <span>Total</span>
               <span>{formatPrice(subtotal)}</span>
             </div>
           </div>
+
           {error && (
             <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
           )}
-          <button type="submit" disabled={submitting} className="btn-primary mt-6 w-full disabled:opacity-60">
-            {submitting ? "Placing order…" : "Place Order"}
-          </button>
+
+          {RAZORPAY ? (
+            <>
+              <button onClick={payOnline} disabled={submitting} className="btn-primary mt-6 w-full disabled:opacity-60">
+                {submitting ? "Processing…" : `Pay ${formatPrice(subtotal)}`}
+              </button>
+              {WHATSAPP && (
+                <button onClick={placeManualOrder} disabled={submitting} className="btn-ghost mt-2 w-full disabled:opacity-60">
+                  Order via WhatsApp instead
+                </button>
+              )}
+            </>
+          ) : (
+            <button onClick={placeManualOrder} disabled={submitting} className="btn-primary mt-6 w-full disabled:opacity-60">
+              {submitting ? "Placing order…" : WHATSAPP ? "Order via WhatsApp" : "Place Order"}
+            </button>
+          )}
+
           <p className="mt-3 text-center text-xs text-charcoal-mute">
             🔒 Your details are used only to fulfil your order.
           </p>
