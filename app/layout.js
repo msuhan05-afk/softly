@@ -19,7 +19,7 @@ const sans = Manrope({
   display: "swap",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://buzzora.example.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://buzzora.co.in";
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
