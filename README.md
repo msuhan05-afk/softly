@@ -42,21 +42,39 @@ All placeholder data lives in `lib/products.js` and is clearly marked:
 
 No certifications, health claims, or statistics have been invented anywhere.
 
-## Payments
+## Checkout & payments
 
-The checkout is **provider-agnostic**. Today orders are created as
-`pending-confirmation` (manual/COD confirmation by the business). To enable
-online payment:
+The checkout adapts to what's configured, so it works on static hosting today
+and upgrades to full online payments when you move to a server host:
 
-1. Set `PAYMENT_PROVIDER=razorpay` (India-first) or `stripe` (international)
-   plus the keys in `.env.local`.
-2. Create the provider order server-side in `app/api/orders/route.js` and
-   return its id to the client for the hosted checkout/payment element.
-3. Mark orders paid **only from the provider webhook** (signature-verified) —
-   never from client-side success callbacks.
+### 1. WhatsApp orders (works on GitHub Pages — no server)
 
-Card details are never touched by this codebase — use the provider's hosted
-checkout / elements.
+Set `NEXT_PUBLIC_WHATSAPP_NUMBER` (international format, digits only, e.g.
+`9199XXXXXXXX`). The checkout button becomes **Order via WhatsApp**: it builds
+the order, opens WhatsApp pre-filled with the items, totals and shipping
+address ready to send to you, and shows a confirmation page. You then confirm
+payment (UPI / bank transfer / COD) and delivery directly with the customer.
+
+On GitHub Pages, set it as a repo **Variable** named `WHATSAPP_NUMBER`
+(Settings → Secrets and variables → Actions → Variables). The deploy workflow
+reads it — no code change, nothing secret committed. `CONTACT_EMAIL` works the
+same way and adds an email fallback.
+
+### 2. Online card/UPI payments via Razorpay (needs a server — e.g. Vercel)
+
+Set `NEXT_PUBLIC_PAYMENT_PROVIDER=razorpay` and the Razorpay keys. The checkout
+button becomes **Pay** and runs the hosted Razorpay flow:
+
+- `app/api/razorpay/order` creates the order with the amount computed
+  **server-side** from the catalogue (client totals are never trusted)
+- `app/api/razorpay/verify` verifies the payment **signature** server-side
+  before the order is marked paid — a forged client success can't slip through
+- `app/api/razorpay/webhook` is the authoritative confirmation (set the
+  endpoint + `RAZORPAY_WEBHOOK_SECRET` in the Razorpay dashboard)
+
+Card details never touch this codebase — Razorpay's hosted checkout handles
+them. GitHub Pages can't run these API routes, so online payment requires
+Vercel (or any Node server).
 
 ## Deploying to Vercel
 
