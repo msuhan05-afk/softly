@@ -9,6 +9,9 @@ export default function Footer() {
             <p className="font-display text-3xl">
               BUZZORA<span className="text-honey-400">.</span>
             </p>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-wider2 text-honey-300">
+              From hive to heart
+            </p>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-cream/70">
               Raw honey, ethically sourced from the valleys of Jammu &amp; Kashmir. From hive
               to jar — nothing added, nothing taken away.

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/components/CartContext";
+import Logo from "@/components/Logo";
 
 const links = [
   { href: "/shop", label: "Shop" },
@@ -38,11 +39,8 @@ export default function Nav() {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 md:h-20">
-        <Link
-          href="/"
-          className="font-display text-2xl tracking-tight text-charcoal md:text-3xl"
-        >
-          BUZZORA<span className="text-honey-500">.</span>
+        <Link href="/" className="text-charcoal">
+          <Logo />
         </Link>
 
         <nav className="hidden items-center gap-7 lg:flex">

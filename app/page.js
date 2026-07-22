@@ -6,6 +6,7 @@ import HoneyQuiz from "@/components/HoneyQuiz";
 import HiveTimeline, { hiveSteps } from "@/components/HiveTimeline";
 import JarVisual from "@/components/JarVisual";
 import Reveal from "@/components/Reveal";
+import { BeeMark } from "@/components/Logo";
 
 export default function HomePage() {
   return (
@@ -51,8 +52,8 @@ export default function HomePage() {
             <div className="relative animate-floaty drop-shadow-2xl">
               <JarVisual tone="#D99A34" label="Wild Tulsi" size={280} />
             </div>
-            <div className="absolute -right-2 top-8 animate-drip text-3xl sm:right-6" aria-hidden>
-              🐝
+            <div className="absolute -right-2 top-8 animate-drip sm:right-6" aria-hidden>
+              <BeeMark size={52} />
             </div>
           </div>
         </div>
