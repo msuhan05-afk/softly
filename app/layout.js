@@ -1,31 +1,76 @@
 import "./globals.css";
-import { Outfit, Reenie_Beanie } from "next/font/google";
+import { DM_Serif_Display, Manrope } from "next/font/google";
+import { CartProvider } from "@/components/CartContext";
+import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
+import CartDrawer from "@/components/CartDrawer";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-outfit",
-  display: "swap",
-});
-
-const reenie = Reenie_Beanie({
+const display = DM_Serif_Display({
   subsets: ["latin"],
   weight: "400",
-  variable: "--font-reenie",
+  variable: "--font-display",
   display: "swap",
 });
 
+const sans = Manrope({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://buzzora.example.com";
+
 export const metadata = {
-  title: "Softly — A quieter way to live with your screen",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Buzzora — Raw Honey from the Valleys of Jammu & Kashmir",
+    template: "%s — Buzzora",
+  },
   description:
-    "Softly is a digital living room — a small, intentional companion for slowing down with your devices. Built by Naman Mehra.",
+    "From hive to jar, nothing added, nothing taken away. Raw honey — Wild Tulsi and Multiflora — ethically sourced from the serene valleys of Jammu & Kashmir.",
+  keywords: [
+    "raw honey",
+    "Jammu Kashmir honey",
+    "wild tulsi honey",
+    "multiflora honey",
+    "natural honey India",
+  ],
+  openGraph: {
+    title: "Buzzora — Raw Honey from the Valleys of Jammu & Kashmir",
+    description:
+      "From hive to jar, nothing added, nothing taken away. Raw honey ethically sourced from J&K.",
+    type: "website",
+    siteName: "Buzzora",
+  },
+};
+
+const orgSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Buzzora",
+  url: SITE_URL,
+  founder: { "@type": "Person", name: "Kannu Priya" },
+  sameAs: ["https://www.instagram.com/_buzzora_/"],
+  description:
+    "Raw honey ethically sourced from the valleys of Jammu & Kashmir. From hive to jar, nothing added, nothing taken away.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${outfit.variable} ${reenie.variable}`}>
-      <body className="font-sans bg-bg text-stone-800 antialiased">
-        <div className="grain-overlay" aria-hidden />
-        {children}
+    <html lang="en" className={`${display.variable} ${sans.variable}`}>
+      <body className="bg-cream font-sans text-charcoal antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+        />
+        <CartProvider>
+          <Nav />
+          {children}
+          <Footer />
+          <CartDrawer />
+          <WhatsAppButton />
+        </CartProvider>
       </body>
     </html>
   );

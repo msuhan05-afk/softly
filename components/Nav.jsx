@@ -1,89 +1,123 @@
 "use client";
+
+import Link from "next/link";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useCart } from "@/components/CartContext";
 
 const links = [
-  { href: "#moments", label: "Moments" },
-  { href: "#practice", label: "Practice" },
-  { href: "#diary", label: "Diary" },
-  { href: "#hello", label: "Hello" },
+  { href: "/shop", label: "Shop" },
+  { href: "/#our-honey", label: "Our Honey" },
+  { href: "/about", label: "Our Story" },
+  { href: "/hive-to-jar", label: "From Hive to Jar" },
+  { href: "/journal", label: "Journal" },
 ];
 
 export default function Nav() {
-  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { count, setDrawerOpen } = useCart();
+  const pathname = usePathname();
+  const overlayHero = pathname === "/";
 
   useEffect(() => {
-    if (open) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "";
-  }, [open]);
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => setMenuOpen(false), [pathname]);
+
+  const solid = scrolled || menuOpen || !overlayHero;
 
   return (
-    <header className="fixed top-4 inset-x-4 z-40 flex justify-center">
-      <nav
-        className="w-full max-w-5xl bg-white/70 backdrop-blur-xl rounded-full shadow-soft border border-stone-100 px-4 sm:px-5 py-2.5 flex items-center justify-between"
-        style={{ backdropFilter: "blur(20px)" }}
-      >
-        <a href="#top" className="flex items-center gap-2 group">
-          <span className="relative w-7 h-7 rounded-full bg-coral flex items-center justify-center shadow-softer">
-            <span className="w-1.5 h-1.5 rounded-full bg-white" />
-          </span>
-          <span className="text-[15px] font-medium tracking-ultra text-stone-800">softly</span>
-        </a>
+    <header
+      className={`fixed inset-x-0 top-0 z-40 transition-all duration-300 ${
+        solid ? "border-b border-charcoal/10 bg-cream/95 backdrop-blur" : "bg-transparent"
+      }`}
+    >
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 md:h-20">
+        <Link
+          href="/"
+          className="font-display text-2xl tracking-tight text-charcoal md:text-3xl"
+        >
+          BUZZORA<span className="text-honey-500">.</span>
+        </Link>
 
-        <ul className="hidden md:flex items-center gap-7 text-[14px] font-medium text-stone-600">
+        <nav className="hidden items-center gap-7 lg:flex">
           {links.map((l) => (
-            <li key={l.href}>
-              <a
-                href={l.href}
-                className="hover:text-stone-800 transition-colors duration-300"
-              >
-                {l.label}
-              </a>
-            </li>
+            <Link
+              key={l.href}
+              href={l.href}
+              className="text-sm font-medium text-charcoal-soft transition hover:text-honey-700"
+            >
+              {l.label}
+            </Link>
           ))}
-        </ul>
+        </nav>
 
         <div className="flex items-center gap-2">
-          <a
-            href="#hello"
-            className="hidden sm:inline-flex bg-stone-800 hover:bg-stone-900 text-white text-[13px] font-medium px-4 py-2 rounded-full transition-transform hover:scale-[1.03] duration-300"
-          >
-            Join the room
-          </a>
           <button
-            onClick={() => setOpen((v) => !v)}
-            className="md:hidden w-9 h-9 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center"
-            aria-label="Menu"
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open cart"
+            className="relative rounded-full p-2.5 transition hover:bg-honey-100"
           >
-            <span className="block w-3.5 h-px bg-stone-700 relative before:content-[''] before:absolute before:-top-1 before:left-0 before:w-3.5 before:h-px before:bg-stone-700 after:content-[''] after:absolute after:top-1 after:left-0 after:w-3.5 after:h-px after:bg-stone-700" />
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 6h15l-1.5 9h-12z" />
+              <path d="M6 6L5 3H2" />
+              <circle cx="9" cy="20" r="1.4" />
+              <circle cx="17" cy="20" r="1.4" />
+            </svg>
+            {count > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-honey-400 px-1 text-[11px] font-bold text-charcoal">
+                {count}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Toggle menu"
+            className="rounded-full p-2.5 transition hover:bg-honey-100 lg:hidden"
+          >
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+              {menuOpen ? (
+                <>
+                  <path d="M5 5l14 14" />
+                  <path d="M19 5L5 19" />
+                </>
+              ) : (
+                <>
+                  <path d="M3 7h18" />
+                  <path d="M3 12h18" />
+                  <path d="M3 17h18" />
+                </>
+              )}
+            </svg>
           </button>
         </div>
-      </nav>
+      </div>
 
-      {open && (
-        <div className="md:hidden fixed inset-x-4 top-20 bg-white/90 backdrop-blur-xl rounded-3xl border border-stone-100 shadow-lifted p-6">
-          <ul className="space-y-4 text-stone-700">
-            {links.map((l) => (
-              <li key={l.href}>
-                <a
-                  href={l.href}
-                  onClick={() => setOpen(false)}
-                  className="text-lg font-medium"
-                >
-                  {l.label}
-                </a>
-              </li>
-            ))}
-            <li>
-              <a
-                href="#hello"
-                onClick={() => setOpen(false)}
-                className="inline-flex bg-stone-800 text-white text-sm font-medium px-4 py-2 rounded-full"
-              >
-                Join the room
-              </a>
-            </li>
-          </ul>
-        </div>
+      {menuOpen && (
+        <nav className="border-t border-charcoal/10 bg-cream px-4 py-4 lg:hidden">
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              onClick={() => setMenuOpen(false)}
+              className="block rounded-xl px-3 py-3 text-base font-medium text-charcoal transition hover:bg-honey-100"
+            >
+              {l.label}
+            </Link>
+          ))}
+          <Link
+            href="/shop"
+            onClick={() => setMenuOpen(false)}
+            className="btn-primary mt-3 w-full"
+          >
+            Shop Raw Honey
+          </Link>
+        </nav>
       )}
     </header>
   );

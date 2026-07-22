@@ -4,56 +4,61 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        bg: "#FDFCF8",
-        sage: "#E8EFE8",
-        lavender: "#EFEDF4",
-        coral: "#FFB7B2",
-        peach: "#FFE4E1",
-        lilac: "#E6E6FA",
-        stone: {
-          50: "#FAF9F7",
-          100: "#F5F4F1",
-          200: "#E7E5E0",
-          300: "#D6D3CD",
-          400: "#A8A29E",
-          500: "#78716C",
-          600: "#57534E",
-          700: "#44403C",
-          800: "#292524",
-          900: "#1C1917",
+        cream: "#FBF7EF",
+        parchment: "#F4EDDF",
+        honey: {
+          50: "#FDF6E7",
+          100: "#FAE9C6",
+          200: "#F5D68E",
+          300: "#EFBE55",
+          400: "#E8A82B",
+          500: "#D99A34",
+          600: "#C98A2B",
+          700: "#A96F1E",
+          800: "#8A5A1E",
+          900: "#5F3D12",
+        },
+        charcoal: {
+          DEFAULT: "#241C12",
+          soft: "#3A3023",
+          mute: "#6B5F4C",
+        },
+        forest: {
+          DEFAULT: "#5C6B45",
+          light: "#7A8B5E",
+          pale: "#EEF1E6",
         },
       },
       fontFamily: {
-        sans: ["var(--font-outfit)", "system-ui", "sans-serif"],
-        hand: ["var(--font-reenie)", "cursive"],
+        display: ["var(--font-display)", "Georgia", "serif"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
       letterSpacing: {
         tightest: "-0.04em",
         ultra: "-0.025em",
+        wider2: "0.18em",
       },
       borderRadius: {
         "4xl": "2rem",
         "5xl": "3rem",
-        "6xl": "4rem",
       },
       boxShadow: {
-        soft: "0 4px 20px -2px rgba(0,0,0,0.05)",
-        softer: "0 2px 12px -2px rgba(0,0,0,0.04)",
-        lifted: "0 12px 40px -8px rgba(0,0,0,0.08)",
+        soft: "0 4px 20px -2px rgba(36,28,18,0.07)",
+        lifted: "0 16px 48px -12px rgba(36,28,18,0.16)",
+        jar: "0 24px 60px -18px rgba(169,111,30,0.35)",
       },
       animation: {
-        float: "float 6s ease-in-out infinite",
-        "float-slow": "float 9s ease-in-out infinite",
-        breathe: "breathe 3.4s ease-in-out infinite",
+        drip: "drip 5s ease-in-out infinite",
+        floaty: "floaty 7s ease-in-out infinite",
       },
       keyframes: {
-        float: {
-          "0%,100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-10px)" },
+        drip: {
+          "0%,100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(8px)" },
         },
-        breathe: {
-          "0%,100%": { transform: "scale(1)", opacity: "1" },
-          "50%": { transform: "scale(1.08)", opacity: "0.92" },
+        floaty: {
+          "0%,100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
         },
       },
     },
