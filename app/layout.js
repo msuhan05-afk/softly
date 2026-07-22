@@ -1,14 +1,14 @@
 import "./globals.css";
-import { DM_Serif_Display, Manrope } from "next/font/google";
+import { Cormorant_Garamond, Manrope } from "next/font/google";
 import { CartProvider } from "@/components/CartContext";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
-const display = DM_Serif_Display({
+const display = Cormorant_Garamond({
   subsets: ["latin"],
-  weight: "400",
+  weight: ["500", "600", "700"],
   variable: "--font-display",
   display: "swap",
 });

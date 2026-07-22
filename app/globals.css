@@ -19,6 +19,12 @@ body {
   color: #241c12;
 }
 
+/* Cormorant Garamond needs weight to carry display sizes with presence. */
+.font-display {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
 .eyebrow {
   @apply text-xs font-semibold uppercase tracking-wider2 text-honey-700;
 }
