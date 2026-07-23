@@ -169,7 +169,7 @@ export default function CheckoutForm() {
 
           {RAZORPAY ? (
             <>
-              <button onClick={payOnline} disabled={submitting} className="btn-primary mt-6 w-full disabled:opacity-60">
+              <button onClick={payOnline} disabled={submitting} className="btn-accent mt-6 w-full disabled:opacity-60">
                 {submitting ? "Processing…" : `Pay ${formatPrice(subtotal)}`}
               </button>
               {WHATSAPP && (
@@ -179,7 +179,7 @@ export default function CheckoutForm() {
               )}
             </>
           ) : (
-            <button onClick={placeManualOrder} disabled={submitting} className="btn-primary mt-6 w-full disabled:opacity-60">
+            <button onClick={placeManualOrder} disabled={submitting} className="btn-accent mt-6 w-full disabled:opacity-60">
               {submitting ? "Placing order…" : WHATSAPP ? "Order via WhatsApp" : "Place Order"}
             </button>
           )}

@@ -54,7 +54,7 @@ export default function ProductCard({ product }) {
           <button
             onClick={() => addItem(product.id, defaultSize.sku)}
             disabled={!defaultSize.inStock}
-            className="rounded-full bg-honey-400 px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-charcoal transition hover:bg-honey-300 disabled:opacity-40"
+            className="rounded-full bg-accent-400 px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-accent-500 disabled:opacity-40"
           >
             Add to Cart
           </button>

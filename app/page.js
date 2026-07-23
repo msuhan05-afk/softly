@@ -6,7 +6,7 @@ import HoneyQuiz from "@/components/HoneyQuiz";
 import HiveTimeline, { hiveSteps } from "@/components/HiveTimeline";
 import JarVisual from "@/components/JarVisual";
 import Reveal from "@/components/Reveal";
-import { BeeMark } from "@/components/Logo";
+import BeeCharacter from "@/components/BeeCharacter";
 
 export default function HomePage() {
   return (
@@ -21,10 +21,17 @@ export default function HomePage() {
           aria-hidden
           className="absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-forest-pale blur-3xl"
         />
+        {/* floating mascots */}
+        <div aria-hidden className="pointer-events-none absolute left-6 top-28 hidden animate-floaty-slow sm:block lg:left-16">
+          <BeeCharacter size={64} />
+        </div>
+        <div aria-hidden className="pointer-events-none absolute bottom-16 right-10 hidden animate-floaty sm:block">
+          <BeeCharacter size={48} />
+        </div>
         <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-2">
           <div className="text-center lg:text-left">
-            <p className="eyebrow">Raw honey · Jammu &amp; Kashmir</p>
-            <h1 className="mt-4 font-display text-5xl leading-[1.05] tracking-ultra sm:text-6xl lg:text-7xl">
+            <span className="sticker">🍯 100% Raw &amp; Unprocessed</span>
+            <h1 className="mt-5 font-display text-5xl leading-[1.05] tracking-ultra sm:text-6xl lg:text-7xl">
               From hive to jar.
               <br />
               <span className="text-honey-600">Nothing added.</span>
@@ -35,9 +42,9 @@ export default function HomePage() {
               Raw honey, ethically sourced from the serene valleys of Jammu &amp; Kashmir —
               jarred exactly as the bees made it.
             </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
-              <Link href="/shop" className="btn-dark">
-                Shop Raw Honey
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+              <Link href="/shop" className="btn-accent">
+                Order Now 🍯
               </Link>
               <Link href="/about" className="btn-ghost">
                 Discover Our Story
@@ -49,14 +56,22 @@ export default function HomePage() {
               aria-hidden
               className="absolute inset-0 m-auto h-72 w-72 rounded-full bg-honey-300/40 blur-2xl sm:h-96 sm:w-96"
             />
+            {/* spinning dashed halo */}
+            <svg aria-hidden className="absolute h-[340px] w-[340px] animate-spin-slow text-honey-400/50 sm:h-[400px] sm:w-[400px]" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="47" stroke="currentColor" strokeWidth="0.6" strokeDasharray="1 3" />
+            </svg>
             <div className="relative animate-floaty drop-shadow-2xl">
               <JarVisual tone="#D99A34" label="Wild Tulsi" size={280} />
             </div>
-            <div className="absolute -right-2 top-8 animate-drip sm:right-6" aria-hidden>
-              <BeeMark size={52} />
+            <div className="absolute -right-2 top-6 animate-wobble sm:right-4" aria-hidden>
+              <BeeCharacter size={72} />
             </div>
           </div>
         </div>
+        {/* honey drip bottom edge */}
+        <svg aria-hidden className="absolute inset-x-0 bottom-0 h-6 w-full text-cream" viewBox="0 0 1200 24" preserveAspectRatio="none" fill="currentColor">
+          <path d="M0 24 V6 Q30 6 30 14 T60 14 Q90 0 120 12 T180 10 Q210 22 240 12 T300 8 Q340 20 380 10 T460 12 Q500 2 540 12 T620 10 Q660 22 700 12 T780 8 Q820 20 860 12 T940 10 Q990 0 1040 12 T1120 12 Q1160 4 1200 12 V24 Z" />
+        </svg>
       </section>
 
       {/* PRODUCT HIGHLIGHTS */}
