@@ -7,6 +7,7 @@ import { useCart } from "@/components/CartContext";
 import { formatPrice } from "@/lib/products";
 import { buildOrder, orderToWhatsAppText, whatsAppUrl, orderMailto } from "@/lib/order";
 import { payWithRazorpay } from "@/lib/razorpay-client";
+import BeeCharacter from "@/components/BeeCharacter";
 
 const fields = [
   { name: "name", label: "Full name", autoComplete: "name", span: 2 },
@@ -123,9 +124,12 @@ export default function CheckoutForm() {
             ))}
           </div>
         </div>
-        <div className="mt-4 rounded-4xl border border-charcoal/10 bg-white p-6 sm:p-8">
+        <div className="relative mt-4 overflow-hidden rounded-4xl border border-charcoal/10 bg-white p-6 sm:p-8">
+          <div aria-hidden className="pointer-events-none absolute -right-3 -top-3 animate-floaty opacity-90">
+            <BeeCharacter size={64} />
+          </div>
           <h2 className="font-display text-2xl">Payment</h2>
-          <p className="mt-3 text-sm leading-relaxed text-charcoal-mute">
+          <p className="mt-3 max-w-[36ch] text-sm leading-relaxed text-charcoal-mute sm:max-w-none">
             {RAZORPAY
               ? "Pay securely online with cards, UPI or netbanking. Your payment is confirmed instantly and verified on our side."
               : WHATSAPP

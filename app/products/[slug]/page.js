@@ -4,6 +4,7 @@ import { products, getProduct, relatedProducts, minPrice, CURRENCY } from "@/lib
 import ProductPurchase from "@/components/ProductPurchase";
 import ProductCard from "@/components/ProductCard";
 import JarVisual from "@/components/JarVisual";
+import BeeCharacter from "@/components/BeeCharacter";
 
 export function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
@@ -76,7 +77,7 @@ export default function ProductPage({ params }) {
 
       <div className="mt-6 grid gap-10 lg:grid-cols-2">
         {/* Gallery */}
-        <div className="relative flex items-center justify-center rounded-5xl bg-gradient-to-b from-honey-100 to-parchment p-10">
+        <div className="relative flex items-center justify-center overflow-hidden rounded-5xl bg-gradient-to-b from-honey-100 to-parchment p-10">
           <div className="absolute left-5 top-5 flex flex-wrap gap-1.5">
             {product.labels.map((l) => (
               <span key={l} className="rounded-full bg-charcoal px-3 py-1 text-[10px] font-bold tracking-wider text-cream">
@@ -84,8 +85,14 @@ export default function ProductPage({ params }) {
               </span>
             ))}
           </div>
-          <div className="animate-floaty">
+          <svg aria-hidden className="absolute h-[300px] w-[300px] animate-spin-slow text-honey-400/40 sm:h-[360px] sm:w-[360px]" viewBox="0 0 100 100" fill="none">
+            <circle cx="50" cy="50" r="47" stroke="currentColor" strokeWidth="0.6" strokeDasharray="1 3" />
+          </svg>
+          <div className="relative animate-floaty">
             <JarVisual tone={product.jarTone} label={product.honeyType} size={260} />
+          </div>
+          <div aria-hidden className="absolute right-6 top-10 animate-wobble">
+            <BeeCharacter size={58} />
           </div>
         </div>
 
