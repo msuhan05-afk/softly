@@ -5,6 +5,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import SplashScreen from "@/components/SplashScreen";
 
 const display = Cormorant_Garamond({
   subsets: ["latin"],
@@ -65,6 +66,7 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
         />
         <CartProvider>
+          <SplashScreen />
           <Nav />
           {children}
           <Footer />

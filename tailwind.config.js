@@ -28,6 +28,17 @@ module.exports = {
           light: "#7A8B5E",
           pale: "#EEF1E6",
         },
+        // Single playful accent — a warm coral-red that pops against honey gold.
+        accent: {
+          50: "#FFF0EC",
+          100: "#FFDDD3",
+          200: "#FFBBA8",
+          300: "#FB9179",
+          400: "#F26A4C",
+          500: "#E64F30",
+          600: "#C63E22",
+          700: "#9E301A",
+        },
       },
       fontFamily: {
         display: ["var(--font-display)", "Georgia", "serif"],
@@ -50,6 +61,11 @@ module.exports = {
       animation: {
         drip: "drip 5s ease-in-out infinite",
         floaty: "floaty 7s ease-in-out infinite",
+        "floaty-slow": "floaty 11s ease-in-out infinite",
+        wingL: "wingL 0.18s ease-in-out infinite alternate",
+        wingR: "wingR 0.18s ease-in-out infinite alternate",
+        wobble: "wobble 3s ease-in-out infinite",
+        "spin-slow": "spin 22s linear infinite",
       },
       keyframes: {
         drip: {
@@ -59,6 +75,18 @@ module.exports = {
         floaty: {
           "0%,100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
+        },
+        wingL: {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(-24deg)" },
+        },
+        wingR: {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(24deg)" },
+        },
+        wobble: {
+          "0%,100%": { transform: "rotate(-4deg)" },
+          "50%": { transform: "rotate(4deg)" },
         },
       },
     },

@@ -37,6 +37,16 @@ body {
   @apply inline-flex items-center justify-center gap-2 rounded-full bg-charcoal px-7 py-3.5 text-sm font-semibold uppercase tracking-widest text-cream transition hover:bg-charcoal-soft active:scale-[0.98];
 }
 
+/* Playful coral accent CTA — the "Order now" energy. */
+.btn-accent {
+  @apply inline-flex items-center justify-center gap-2 rounded-full bg-accent-400 px-7 py-3.5 text-sm font-bold uppercase tracking-widest text-white shadow-[0_8px_0_-2px_#C63E22] transition hover:bg-accent-500 hover:shadow-[0_6px_0_-2px_#9E301A] active:translate-y-1 active:shadow-[0_3px_0_-2px_#9E301A];
+}
+
+/* Sticker-style badge. */
+.sticker {
+  @apply inline-flex -rotate-3 items-center gap-1.5 rounded-full border-2 border-charcoal bg-honey-200 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-charcoal shadow-[2px_2px_0_#241C12];
+}
+
 .btn-ghost {
   @apply inline-flex items-center justify-center gap-2 rounded-full border border-charcoal/25 px-7 py-3.5 text-sm font-semibold uppercase tracking-widest text-charcoal transition hover:border-charcoal hover:bg-charcoal hover:text-cream active:scale-[0.98];
 }
@@ -62,4 +72,20 @@ body {
     transform: none;
     transition: none;
   }
+  .animate-floaty,
+  .animate-floaty-slow,
+  .animate-wobble,
+  .animate-wingL,
+  .animate-wingR,
+  .animate-drip,
+  .animate-spin-slow {
+    animation: none !important;
+  }
+}
+
+/* Wavy honey-drip divider between sections. */
+.drip-divider {
+  height: 26px;
+  background-repeat: repeat-x;
+  background-size: 48px 26px;
 }
