@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { formatPrice } from "@/lib/products";
+import BeeCharacter from "@/components/BeeCharacter";
 
 export default function OrderSuccess() {
   const params = useSearchParams();
@@ -23,7 +24,10 @@ export default function OrderSuccess() {
 
   return (
     <div className="text-center">
-      <p className="text-5xl">🍯</p>
+      <div className="mx-auto flex w-fit animate-wobble justify-center">
+        <BeeCharacter size={92} />
+      </div>
+      <span className="sticker mt-4">🎉 Order placed!</span>
       <h1 className="mt-4 font-display text-4xl sm:text-5xl">Your honey is on its way.</h1>
       <p className="mt-3 text-charcoal-mute">
         {order?.status === "paid" ? (
