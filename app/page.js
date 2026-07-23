@@ -4,11 +4,12 @@ import { articles } from "@/lib/articles";
 import ProductCard from "@/components/ProductCard";
 import HoneyQuiz from "@/components/HoneyQuiz";
 import HiveTimeline, { hiveSteps } from "@/components/HiveTimeline";
-import JarVisual from "@/components/JarVisual";
+import ProductVisual from "@/components/ProductVisual";
 import Reveal from "@/components/Reveal";
 import BeeCharacter from "@/components/BeeCharacter";
 
 export default function HomePage() {
+  const heroProduct = products.find((p) => p.id === "wild-tulsi") || products[0];
   return (
     <main className="overflow-x-hidden">
       {/* HERO */}
@@ -61,7 +62,7 @@ export default function HomePage() {
               <circle cx="50" cy="50" r="47" stroke="currentColor" strokeWidth="0.6" strokeDasharray="1 3" />
             </svg>
             <div className="relative animate-floaty drop-shadow-2xl">
-              <JarVisual tone="#D99A34" label="Wild Tulsi" size={280} />
+              <ProductVisual product={heroProduct} size={280} />
             </div>
             <div className="absolute -right-2 top-6 animate-wobble sm:right-4" aria-hidden>
               <BeeCharacter size={72} />

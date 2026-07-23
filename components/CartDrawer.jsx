@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCart } from "@/components/CartContext";
 import { formatPrice } from "@/lib/products";
-import JarVisual from "@/components/JarVisual";
+import ProductVisual from "@/components/ProductVisual";
 
 export default function CartDrawer() {
   const { items, updateQty, subtotal, drawerOpen, setDrawerOpen } = useCart();
@@ -56,8 +56,8 @@ export default function CartDrawer() {
                   key={`${item.productId}-${item.sizeSku}`}
                   className="flex gap-3 rounded-2xl border border-charcoal/10 bg-white p-3"
                 >
-                  <div className="flex h-20 w-16 shrink-0 items-center justify-center rounded-xl bg-honey-50">
-                    <JarVisual tone={item.product.jarTone} label={item.product.honeyType} size={52} />
+                  <div className="flex h-20 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-honey-50">
+                    <ProductVisual product={item.product} size={52} fill className="rounded-xl" />
                   </div>
                   <div className="flex flex-1 flex-col">
                     <p className="text-sm font-semibold">{item.product.name}</p>

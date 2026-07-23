@@ -80,19 +80,18 @@ export default function SplashScreen() {
             </motion.div>
           </div>
 
-          {/* wordmark */}
+          {/* real brand badge — large enough here for the baked-in wordmark to read */}
           <motion.div
-            className="mt-6 text-center"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
+            className="mt-4 text-center"
+            initial={{ opacity: 0, scale: 0.85, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ delay: reduce ? 0.2 : 1.1, duration: 0.6, ease: "easeOut" }}
           >
-            <p className="font-display text-5xl tracking-tight text-charcoal sm:text-6xl">
-              BUZZORA<span className="text-accent-500">.</span>
-            </p>
-            <p className="mt-1 text-xs font-semibold uppercase tracking-wider2 text-honey-700">
-              From hive to heart
-            </p>
+            <img
+              src="/logo.jpg"
+              alt="Buzzora — From hive to heart"
+              className="mx-auto h-40 w-40 rounded-full object-cover shadow-lifted sm:h-48 sm:w-48"
+            />
           </motion.div>
         </motion.div>
       )}

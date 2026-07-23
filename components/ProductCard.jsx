@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCart } from "@/components/CartContext";
 import { formatPrice, minPrice } from "@/lib/products";
-import JarVisual from "@/components/JarVisual";
+import ProductVisual from "@/components/ProductVisual";
 
 export default function ProductCard({ product }) {
   const { addItem } = useCart();
@@ -16,7 +16,7 @@ export default function ProductCard({ product }) {
         className="relative flex items-center justify-center bg-gradient-to-b from-honey-50 to-parchment px-6 pb-4 pt-8"
       >
         <div className="transition duration-500 group-hover:-translate-y-1.5 group-hover:scale-[1.03]">
-          <JarVisual tone={product.jarTone} label={product.honeyType} size={170} />
+          <ProductVisual product={product} size={170} />
         </div>
         <div className="absolute left-4 top-4 flex flex-wrap gap-1.5">
           {product.labels.map((l) => (

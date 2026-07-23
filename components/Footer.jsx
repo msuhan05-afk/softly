@@ -6,10 +6,17 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <div className="grid gap-10 md:grid-cols-4">
           <div className="md:col-span-2">
-            <p className="font-display text-3xl">
-              BUZZORA<span className="text-honey-400">.</span>
-            </p>
-            <p className="mt-1 text-xs font-semibold uppercase tracking-wider2 text-honey-300">
+            <div className="flex items-center gap-3">
+              <img
+                src="/logo.jpg"
+                alt="Buzzora"
+                className="h-11 w-11 rounded-full object-cover"
+              />
+              <p className="font-display text-3xl">
+                BUZZORA<span className="text-honey-400">.</span>
+              </p>
+            </div>
+            <p className="mt-2 text-xs font-semibold uppercase tracking-wider2 text-honey-300">
               From hive to heart
             </p>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-cream/70">

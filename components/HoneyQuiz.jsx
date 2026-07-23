@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { products } from "@/lib/products";
-import JarVisual from "@/components/JarVisual";
+import ProductVisual from "@/components/ProductVisual";
 
 // One-question product finder — reduces decision fatigue without a long quiz.
 const options = [
@@ -40,8 +40,8 @@ export default function HoneyQuiz() {
         </>
       ) : (
         <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:text-left">
-          <div className="shrink-0 rounded-3xl bg-honey-50 p-4">
-            <JarVisual tone={product.jarTone} label={product.honeyType} size={120} />
+          <div className="shrink-0 overflow-hidden rounded-3xl bg-honey-50 p-4">
+            <ProductVisual product={product} size={120} />
           </div>
           <div>
             <p className="eyebrow">We&apos;d recommend</p>
