@@ -3,7 +3,7 @@ import Link from "next/link";
 import { products, getProduct, relatedProducts, minPrice, CURRENCY } from "@/lib/products";
 import ProductPurchase from "@/components/ProductPurchase";
 import ProductCard from "@/components/ProductCard";
-import JarVisual from "@/components/JarVisual";
+import ProductVisual from "@/components/ProductVisual";
 import BeeCharacter from "@/components/BeeCharacter";
 
 export function generateStaticParams() {
@@ -89,7 +89,7 @@ export default function ProductPage({ params }) {
             <circle cx="50" cy="50" r="47" stroke="currentColor" strokeWidth="0.6" strokeDasharray="1 3" />
           </svg>
           <div className="relative animate-floaty">
-            <JarVisual tone={product.jarTone} label={product.honeyType} size={260} />
+            <ProductVisual product={product} size={260} />
           </div>
           <div aria-hidden className="absolute right-6 top-10 animate-wobble">
             <BeeCharacter size={58} />
