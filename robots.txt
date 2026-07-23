@@ -1,0 +1,7 @@
+User-Agent: *
+Allow: /
+Disallow: /checkout
+Disallow: /order-success
+Disallow: /api/
+
+Sitemap: https://msuhan05-afk.github.io/softly/sitemap.xml
