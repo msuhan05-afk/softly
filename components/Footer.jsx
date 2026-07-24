@@ -55,8 +55,14 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-12 flex flex-col gap-2 border-t border-cream/10 pt-6 text-xs text-cream/50 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-3 border-t border-cream/10 pt-6 text-xs text-cream/50 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} Buzzora. All rights reserved.</p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <Link href="/policies" className="transition hover:text-honey-300">Terms &amp; Policies</Link>
+            <Link href="/policies#privacy" className="transition hover:text-honey-300">Privacy Policy</Link>
+            <Link href="/policies#shipping" className="transition hover:text-honey-300">Shipping</Link>
+            <Link href="/policies#returns" className="transition hover:text-honey-300">Returns</Link>
+          </div>
           <p>From the valleys of Jammu &amp; Kashmir 🍯</p>
         </div>
       </div>
