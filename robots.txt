@@ -1,0 +1,7 @@
+User-Agent: *
+Allow: /
+Disallow: /checkout
+Disallow: /order-success
+Disallow: /api/
+
+Sitemap: https://buzzora.co.in/sitemap.xml
