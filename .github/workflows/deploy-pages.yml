@@ -28,8 +28,9 @@ jobs:
       - run: npm run build
         env:
           NEXT_EXPORT: "1"
-          NEXT_PUBLIC_BASE_PATH: /softly
-          NEXT_PUBLIC_SITE_URL: https://msuhan05-afk.github.io/softly
+          # Served from the buzzora.co.in custom domain root (public/CNAME),
+          # so no basePath prefix is needed.
+          NEXT_PUBLIC_SITE_URL: https://buzzora.co.in
           # WhatsApp orders + support button. (On Vercel, set this in the
           # project's Environment Variables instead.)
           NEXT_PUBLIC_WHATSAPP_NUMBER: "916005039259"
