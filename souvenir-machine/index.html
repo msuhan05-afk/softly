@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Souvenir Machine — Audio-to-Image Ambience Engine</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <main id="app">
+      <header>
+        <h1>Souvenir Machine</h1>
+        <p class="subtitle">
+          Audio-to-image ambience engine — 30 seconds of a place, translated
+          into a picture by explicit, documented rules. No machine learning.
+        </p>
+      </header>
+
+      <section id="controls">
+        <label>
+          Mode:
+          <select id="modeSelect">
+            <option value="machine">Machine pick</option>
+            <option value="curate">Curate (6 options)</option>
+          </select>
+        </label>
+        <button id="recordBtn">Start 30s recording</button>
+        <button id="toggleDebugBtn" disabled>Show transparency panel</button>
+        <button id="exportBtn" disabled>Export print PNG</button>
+        <div id="progress" class="progress" hidden><div id="progressBar"></div></div>
+        <p id="status" role="status"></p>
+      </section>
+
+      <section id="result">
+        <div id="canvasHost"></div>
+        <div id="curateGrid" class="curate-grid" hidden></div>
+      </section>
+
+      <aside id="debugPanel" class="debug-panel" hidden></aside>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
