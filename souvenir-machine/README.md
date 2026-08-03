@@ -71,6 +71,33 @@ Raw audio is never stored — only the numeric features extracted per frame
 are kept in memory, and they're discarded once the image is rendered
 (build spec section 11).
 
+## Deploying to Vercel
+
+This is a static Vite app, but it lives in a subdirectory of the repo
+alongside the unrelated Buzzora Next.js app — so when importing into
+Vercel, point it at this subdirectory:
+
+1. In the Vercel dashboard, **Add New… → Project** and import this GitHub
+   repo (`msuhan05-afk/Namans-Project`).
+2. Under **Root Directory**, click Edit and select `souvenir-machine`.
+3. Framework Preset should auto-detect as **Vite** (Build Command
+   `npm run build`, Output Directory `dist` — also pinned in
+   `vercel.json` in this folder so they're correct even if
+   auto-detection doesn't kick in).
+4. Deploy. No environment variables are needed — calibration data ships
+   in `public/calibration.json` and is served as a static file.
+5. Vercel serves everything over HTTPS by default, which satisfies the
+   microphone-access requirement (`getUserMedia` needs `https` or
+   `localhost`) with no extra config.
+
+To deploy from the CLI instead:
+
+```bash
+cd souvenir-machine
+npx vercel        # first run links/creates the project and deploys a preview
+npx vercel --prod # promotes to production
+```
+
 ## Out of scope here
 
 Music (Tone.js), printing, QR codes, and scent layers are separate stages
