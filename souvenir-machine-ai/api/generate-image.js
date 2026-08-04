@@ -1,4 +1,4 @@
-// Vercel serverless function. Keeps OPENAI_API_KEY server-side only — the
+// Vercel serverless function. Keeps HF_TOKEN server-side only — the
 // browser never sees it, it only ever posts a text prompt here.
 
 import { generateImage } from '../lib/generateImage.js';
@@ -9,9 +9,9 @@ export default async function handler(req, res) {
     return;
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.HF_TOKEN;
   if (!apiKey) {
-    res.status(500).json({ error: 'Server is not configured with OPENAI_API_KEY.' });
+    res.status(500).json({ error: 'Server is not configured with HF_TOKEN.' });
     return;
   }
 
@@ -22,8 +22,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const image = await generateImage({ prompt, apiKey });
-    res.status(200).json({ image });
+    const { base64, contentType } = await generateImage({ prompt, apiKey });
+    res.status(200).json({ image: base64, contentType });
   } catch (err) {
     res.status(502).json({ error: err.message });
   }

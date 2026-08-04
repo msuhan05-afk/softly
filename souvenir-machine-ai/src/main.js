@@ -71,7 +71,7 @@ async function requestImage(prompt) {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || `Request failed with ${res.status}`);
-  return data.image; // base64-encoded PNG
+  return data; // { image: base64, contentType }
 }
 
 recordBtn.addEventListener('click', async () => {
@@ -94,19 +94,20 @@ recordBtn.addEventListener('click', async () => {
     const { prompt, rows } = buildPrompt(aggregate, bundle);
     renderPromptPanel(prompt, rows);
 
-    setStatus('Generating image (calls a paid AI image API)…');
-    const b64 = await requestImage(prompt);
+    setStatus('Generating image (calls the FLUX.1-schnell model on Hugging Face — may take a moment on a cold start)…');
+    const { image, contentType } = await requestImage(prompt);
+    const ext = contentType.includes('png') ? 'png' : 'jpg';
 
     imageHost.innerHTML = '';
     const img = document.createElement('img');
-    img.src = `data:image/png;base64,${b64}`;
+    img.src = `data:${contentType};base64,${image}`;
     img.alt = 'AI-generated image of this place, from its sound';
     imageHost.appendChild(img);
 
     const downloadLink = document.createElement('a');
     downloadLink.href = img.src;
-    downloadLink.download = `souvenir-ai-${Date.now()}.png`;
-    downloadLink.textContent = 'Download PNG';
+    downloadLink.download = `souvenir-ai-${Date.now()}.${ext}`;
+    downloadLink.textContent = `Download ${ext.toUpperCase()}`;
     downloadLink.style.display = 'block';
     downloadLink.style.marginTop = '0.75rem';
     downloadLink.style.color = 'var(--accent)';

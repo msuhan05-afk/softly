@@ -20,10 +20,10 @@ const server = http.createServer(async (req, res) => {
   req.on('end', async () => {
     try {
       const { prompt } = JSON.parse(body || '{}');
-      const apiKey = process.env.OPENAI_API_KEY;
+      const apiKey = process.env.HF_TOKEN;
       if (!apiKey) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Set OPENAI_API_KEY in your environment before running this locally.' }));
+        res.end(JSON.stringify({ error: 'Set HF_TOKEN in your environment before running this locally.' }));
         return;
       }
       if (!prompt) {
@@ -31,9 +31,9 @@ const server = http.createServer(async (req, res) => {
         res.end(JSON.stringify({ error: 'Missing prompt' }));
         return;
       }
-      const image = await generateImage({ prompt, apiKey });
+      const { base64, contentType } = await generateImage({ prompt, apiKey });
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ image }));
+      res.end(JSON.stringify({ image: base64, contentType }));
     } catch (err) {
       res.writeHead(502, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: err.message }));
