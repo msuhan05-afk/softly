@@ -100,7 +100,9 @@ button:not(:disabled):hover {
 
 #result {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
   min-height: 200px;
 }
 
@@ -110,6 +112,30 @@ button:not(:disabled):hover {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
 }
 
+#soundHost {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+#soundHost audio {
+  width: 100%;
+  max-width: 480px;
+}
+
+.download-link {
+  display: block;
+  margin-top: 0.75rem;
+  color: var(--accent);
+}
+
+.result-error {
+  color: #f87171;
+  font-size: 0.9rem;
+}
+
 .prompt-panel {
   margin-top: 2rem;
   background: var(--panel);
@@ -117,6 +143,12 @@ button:not(:disabled):hover {
   border-radius: 8px;
   padding: 1rem;
   overflow-x: auto;
+}
+
+.prompt-section + .prompt-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #262626;
 }
 
 .prompt-text {
