@@ -62,6 +62,39 @@ The image and sound requests fire in parallel (`Promise.allSettled` in
 (rate limit, bad key, cold start) the other still displays, with an
 inline error where the failed one would be.
 
+## Sound recognition page (`/recognize.html`)
+
+A separate, unrelated page: it doesn't generate anything, it *classifies*.
+Records a short (6s) clip and asks
+[LAION's CLAP](https://github.com/LAION-AI/CLAP) — Contrastive
+Language-Audio Pretraining — to score it against whatever text labels you
+type in, via the Hugging Face Inference API's
+zero-shot-audio-classification pipeline
+([`laion/clap-htsat-unfused`](https://huggingface.co/laion/clap-htsat-unfused)).
+Reuses `HF_TOKEN`, no separate key needed.
+
+This is a genuinely different capability from the two generation pages —
+CLAP takes an actual audio waveform and arbitrary labels supplied at
+request time, rather than hand-extracted numeric features feeding a fixed
+prompt template. So it gets its own capture path:
+
+- `src/wavRecorder.js` — records via `ScriptProcessorNode` and encodes raw
+  PCM into a 16-bit WAV blob client-side, no library. This is separate
+  from `src/audio.js` (which only extracts Meyda features, never keeps
+  actual audio) because CLAP needs the waveform itself.
+- `src/recognize.js` — records, encodes, POSTs `{ audio, labels }` to
+  `/api/recognize-sound`, renders the returned `{ label, score }[]` as a
+  ranked bar list.
+- `lib/recognizeSound.js` / `api/recognize-sound.js` — mirrors the other
+  two pipelines' shared-lib pattern; exports `DEFAULT_LABELS` as a
+  generic environmental-sound-category fallback if the request omits
+  labels (`src/recognize.js` pre-fills the same list, kept in sync
+  manually).
+
+`vite.config.js` lists `recognize.html` as a second Rollup entry point —
+without that, `vite build` only bundles `index.html` and this page 404s
+in production even though it works fine in dev.
+
 ## Setup
 
 ```bash
@@ -77,8 +110,8 @@ Needs two processes in dev — one for the frontend, one standing in for the
 Vercel serverless functions locally:
 
 ```bash
-npm run dev:api   # terminal 1 — generate-image + generate-sound APIs on :5175
-npm run dev        # terminal 2 — Vite dev server on :5173, proxies /api to :5175
+npm run dev:api   # terminal 1 — generate-image + generate-sound + recognize-sound APIs on :5175
+npm run dev        # terminal 2 — Vite dev server on :5173, proxies /api to :5175 — visit /recognize.html for CLAP
 ```
 
 Both `HF_TOKEN` and `ELEVENLABS_API_KEY` must be set in the environment
@@ -97,13 +130,14 @@ exposure.
 
 Hugging Face's free Inference API tier has rate limits (and usage-based
 paid tiers beyond that) — check current limits at
-https://huggingface.co/docs/api-inference. ElevenLabs' sound-generation
-API is metered against your account's character/credit quota — check
-current pricing at https://elevenlabs.io/pricing. There's no caching, no
-rate limiting, and no cap in this build for either provider — add one
-before exposing this publicly (e.g. a request counter, a server-side rate
-limit in `api/generate-image.js` / `api/generate-sound.js`, or gating
-behind auth).
+https://huggingface.co/docs/api-inference. This applies to
+`/recognize.html` too, since it shares `HF_TOKEN` and the Inference API
+with the image pipeline. ElevenLabs' sound-generation API is metered
+against your account's character/credit quota — check current pricing at
+https://elevenlabs.io/pricing. There's no caching, no rate limiting, and
+no cap in this build for any of the three endpoints — add one before
+exposing this publicly (e.g. a request counter, a server-side rate limit
+in each `api/*.js` function, or gating behind auth).
 
 ## Structure
 
@@ -118,8 +152,13 @@ behind auth).
 | `api/generate-sound.js` | Vercel serverless function — calls ElevenLabs, keeps `ELEVENLABS_API_KEY` server-side |
 | `lib/generateImage.js` | Shared image-model call, used by both the Vercel function and local dev |
 | `lib/generateSound.js` | Shared sound-model call, used by both the Vercel function and local dev |
-| `dev-api-server.js` | Local stand-in for both Vercel functions during `npm run dev` |
+| `dev-api-server.js` | Local stand-in for all three Vercel functions during `npm run dev` |
 | `public/calibration.json` | Same placeholder calibration data as the sibling engine — see its README for recalibration steps |
+| `recognize.html` | The CLAP sound-recognition page — separate from `index.html` |
+| `src/wavRecorder.js` | Client-side mic → 16-bit WAV encoder, used only by the recognition page |
+| `src/recognize.js` | Orchestration for the recognition page: record → encode → call CLAP → render ranked scores |
+| `api/recognize-sound.js` | Vercel serverless function — calls the CLAP zero-shot-audio-classification pipeline, keeps `HF_TOKEN` server-side |
+| `lib/recognizeSound.js` | Shared CLAP call + `DEFAULT_LABELS` fallback, used by both the Vercel function and local dev |
 
 ## Deploying to Vercel
 
@@ -127,22 +166,26 @@ Same pattern as `souvenir-machine/`: import this repo, set **Root
 Directory** to `souvenir-machine-ai`, and add both **Environment
 Variables** — `HF_TOKEN` and `ELEVENLABS_API_KEY` — in the project
 settings (Settings → Environment Variables). Enter real values directly
-in the Vercel dashboard, not anywhere in the repo or in chat. Both
-serverless functions read their key server-side, so neither is ever sent
-to the browser. `vercel.json` pins the Vite build; Vercel picks up
-`api/generate-image.js` and `api/generate-sound.js` as serverless
-functions automatically.
+in the Vercel dashboard, not anywhere in the repo or in chat. All three
+serverless functions read their key server-side, so none is ever sent to
+the browser. `vercel.json` pins the Vite build; Vercel picks up
+`api/generate-image.js`, `api/generate-sound.js`, and
+`api/recognize-sound.js` as serverless functions automatically —
+`vite.config.js`'s multi-entry build makes sure `recognize.html` ships in
+`dist/` alongside `index.html`.
 
 ## Testing status
 
-The record → aggregate → build-prompts pipeline has been verified
-end-to-end (headless browser, fake mic input, correct prompt text
-produced for both the image and sound prompts, and both requests fire
-with the right payloads). **Neither the Hugging Face nor the ElevenLabs
-call has been tested against the real APIs** in this session — no valid
-keys were available in the build environment. Before relying on this, set
-real keys and confirm `POST /api/generate-image` and
-`POST /api/generate-sound` each return usable output.
+The record → aggregate → build-prompts pipeline (both generation pages)
+and the record → encode → classify pipeline (`/recognize.html`) have both
+been verified end-to-end in a headless browser with a fake mic device:
+correct prompt/label payloads built, all three `/api/*` requests fire
+with the right bodies. **None of the three provider calls (Hugging Face
+image, ElevenLabs sound, Hugging Face CLAP) have been tested against the
+real APIs** in this session — no valid keys were available in the build
+environment. Before relying on this, set real keys and confirm
+`POST /api/generate-image`, `POST /api/generate-sound`, and
+`POST /api/recognize-sound` each return usable output.
 
 ## Ethics note
 

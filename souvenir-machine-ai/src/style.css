@@ -136,6 +136,70 @@ button:not(:disabled):hover {
   font-size: 0.9rem;
 }
 
+.labels-label {
+  display: block;
+  color: #9aa;
+  font-size: 0.85rem;
+  flex: 1 1 100%;
+}
+
+textarea {
+  font: inherit;
+  flex: 1 1 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background: var(--panel);
+  color: var(--text);
+  resize: vertical;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+#resultsHost {
+  margin-top: 1.5rem;
+}
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.result-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2fr auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.result-label {
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.result-bar-track {
+  height: 8px;
+  background: #222;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.result-bar-fill {
+  height: 100%;
+  background: var(--accent);
+}
+
+.result-pct {
+  font-size: 0.85rem;
+  color: #9aa;
+  text-align: right;
+  min-width: 3ch;
+}
+
 .prompt-panel {
   margin-top: 2rem;
   background: var(--panel);

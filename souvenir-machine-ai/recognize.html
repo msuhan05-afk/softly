@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sound Recognition (CLAP) — Souvenir Machine</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <main id="app">
+      <header>
+        <h1>Sound Recognition <span class="badge">CLAP</span></h1>
+        <p class="subtitle">
+          Records a short clip and asks
+          <a href="https://github.com/LAION-AI/CLAP" target="_blank" rel="noopener">LAION's CLAP</a>
+          model to score it against whatever text labels you list below —
+          zero-shot audio classification, not a fixed category set.
+          <a href="/index.html">&larr; Back to the image/sound generator</a>
+        </p>
+      </header>
+
+      <section id="controls">
+        <label for="labelsInput" class="labels-label">Candidate labels (comma-separated):</label>
+        <textarea id="labelsInput" rows="3"></textarea>
+        <button id="recordBtn">Record 6s clip &amp; identify</button>
+        <div id="progress" class="progress" hidden><div id="progressBar"></div></div>
+        <p id="status" role="status"></p>
+      </section>
+
+      <section id="resultsHost"></section>
+    </main>
+
+    <script type="module" src="/src/recognize.js"></script>
+  </body>
+</html>
