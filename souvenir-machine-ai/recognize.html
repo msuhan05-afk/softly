@@ -7,6 +7,17 @@
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
+    <nav class="topnav">
+      <a class="brand" href="/index.html">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        Souvenir Machine
+      </a>
+      <div class="topnav-links">
+        <a href="/index.html" class="topnav-link">Generate</a>
+        <a href="/recognize.html" class="topnav-link is-active">Recognize</a>
+      </div>
+    </nav>
+
     <main id="app">
       <header>
         <h1>Sound Recognition <span class="badge">CLAP</span></h1>
@@ -15,19 +26,23 @@
           <a href="https://github.com/LAION-AI/CLAP" target="_blank" rel="noopener">LAION's CLAP</a>
           model to score it against whatever text labels you list below —
           zero-shot audio classification, not a fixed category set.
-          <a href="/index.html">&larr; Back to the image/sound generator</a>
         </p>
       </header>
 
-      <section id="controls">
-        <label for="labelsInput" class="labels-label">Candidate labels (comma-separated):</label>
+      <section id="controls" class="card">
+        <label for="labelsInput" class="labels-label">Candidate labels (comma-separated)</label>
         <textarea id="labelsInput" rows="3"></textarea>
-        <button id="recordBtn">Record 6s clip &amp; identify</button>
+        <button id="recordBtn" class="btn-primary">🎙️ Record 6s clip &amp; identify</button>
         <div id="progress" class="progress" hidden><div id="progressBar"></div></div>
-        <p id="status" role="status"></p>
+        <div class="status-pill" id="statusPill" data-state="idle">
+          <span class="status-dot"></span>
+          <span id="status" role="status"></span>
+        </div>
       </section>
 
-      <section id="resultsHost"></section>
+      <section id="resultsHost" class="card">
+        <p class="placeholder">No clip recorded yet.</p>
+      </section>
     </main>
 
     <script type="module" src="/src/recognize.js"></script>

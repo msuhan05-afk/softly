@@ -10,6 +10,7 @@ import { buildSoundPrompt } from './soundPrompt.js';
 
 const recordBtn = document.getElementById('recordBtn');
 const statusEl = document.getElementById('status');
+const statusPill = document.getElementById('statusPill');
 const progressWrap = document.getElementById('progress');
 const progressBar = document.getElementById('progressBar');
 const imageHost = document.getElementById('imageHost');
@@ -18,8 +19,11 @@ const promptPanel = document.getElementById('promptPanel');
 
 let calibration = null;
 
-function setStatus(text) {
+// state: 'idle' | 'recording' | 'working' | 'done' | 'partial' | 'error'
+// — drives the status-pill dot color/pulse in src/style.css.
+function setStatus(text, state = 'idle') {
   statusEl.textContent = text;
+  statusPill.dataset.state = state;
 }
 
 async function ensureCalibration() {
@@ -33,8 +37,7 @@ function renderPromptSection(container, title, promptText, rows) {
 
   const heading = document.createElement('p');
   heading.textContent = title;
-  heading.style.color = '#9aa';
-  heading.style.marginBottom = '0.25rem';
+  heading.className = 'prompt-section-title';
   section.appendChild(heading);
 
   const promptEl = document.createElement('p');
@@ -140,7 +143,7 @@ recordBtn.addEventListener('click', async () => {
     recordBtn.disabled = true;
     progressWrap.hidden = false;
     progressBar.style.width = '0%';
-    setStatus('Listening… recording 30 seconds of ambient sound.');
+    setStatus('Listening… recording 30 seconds of ambient sound.', 'recording');
 
     const cal = await ensureCalibration();
     const frames = await recordAmbience({
@@ -149,7 +152,7 @@ recordBtn.addEventListener('click', async () => {
       },
     });
 
-    setStatus('Building prompts from audio features…');
+    setStatus('Building prompts from audio features…', 'working');
     const aggregate = aggregateFrames(frames);
     const bundle = normaliseFeatures(aggregate, cal);
     const { prompt: imagePrompt, rows: imageRows } = buildPrompt(aggregate, bundle);
@@ -157,7 +160,8 @@ recordBtn.addEventListener('click', async () => {
     renderPromptPanel({ imagePrompt, imageRows, soundPrompt, soundRows });
 
     setStatus(
-      'Generating image (FLUX.1-schnell via Hugging Face) and ambience (ElevenLabs) — may take a moment, especially on a cold start…'
+      'Generating image (FLUX.1-schnell via Hugging Face) and ambience (ElevenLabs) — may take a moment, especially on a cold start…',
+      'working'
     );
     imageHost.innerHTML = '';
     soundHost.innerHTML = '';
@@ -180,10 +184,10 @@ recordBtn.addEventListener('click', async () => {
     }
 
     const failures = [imageResult, soundResult].filter((r) => r.status === 'rejected').length;
-    setStatus(failures === 0 ? 'Done.' : `Done, with ${failures} of 2 generations failing (see above).`);
+    setStatus(failures === 0 ? 'Done.' : `Done, with ${failures} of 2 generations failing (see above).`, failures === 0 ? 'done' : 'partial');
   } catch (err) {
     console.error(err);
-    setStatus(`Error: ${err.message}`);
+    setStatus(`Error: ${err.message}`, 'error');
   } finally {
     recordBtn.disabled = false;
     progressWrap.hidden = true;
@@ -191,5 +195,6 @@ recordBtn.addEventListener('click', async () => {
 });
 
 setStatus(
-  `Ready. Recording captures ${RECORD_SECONDS} seconds of audio; nothing is saved except the extracted numeric features and the prompts built from them.`
+  `Ready. Recording captures ${RECORD_SECONDS} seconds of audio; nothing is saved except the extracted numeric features and the prompts built from them.`,
+  'idle'
 );

@@ -31,6 +31,7 @@ const DEFAULT_LABELS = [
 
 const recordBtn = document.getElementById('recordBtn');
 const statusEl = document.getElementById('status');
+const statusPill = document.getElementById('statusPill');
 const progressWrap = document.getElementById('progress');
 const progressBar = document.getElementById('progressBar');
 const labelsInput = document.getElementById('labelsInput');
@@ -38,8 +39,11 @@ const resultsHost = document.getElementById('resultsHost');
 
 labelsInput.value = DEFAULT_LABELS.join(', ');
 
-function setStatus(text) {
+// state: 'idle' | 'recording' | 'working' | 'done' | 'error' — drives the
+// status-pill dot color/pulse in src/style.css.
+function setStatus(text, state = 'idle') {
   statusEl.textContent = text;
+  statusPill.dataset.state = state;
 }
 
 function parseLabels(raw) {
@@ -69,6 +73,14 @@ function renderResults(results) {
   resultsHost.appendChild(list);
 }
 
+function renderResultsError(message) {
+  resultsHost.innerHTML = '';
+  const p = document.createElement('p');
+  p.className = 'result-error';
+  p.textContent = `Recognition failed: ${message}`;
+  resultsHost.appendChild(p);
+}
+
 recordBtn.addEventListener('click', async () => {
   try {
     recordBtn.disabled = true;
@@ -81,14 +93,14 @@ recordBtn.addEventListener('click', async () => {
       throw new Error('Enter at least two candidate labels, comma-separated.');
     }
 
-    setStatus(`Listening… recording ${RECORD_SECONDS} seconds of sound.`);
+    setStatus(`Listening… recording ${RECORD_SECONDS} seconds of sound.`, 'recording');
     const wavBlob = await recordClip(RECORD_SECONDS, {
       onProgress: (t) => {
         progressBar.style.width = `${Math.round(t * 100)}%`;
       },
     });
 
-    setStatus('Encoding clip and asking CLAP what it hears (may take a moment on a cold start)…');
+    setStatus('Encoding clip and asking CLAP what it hears (may take a moment on a cold start)…', 'working');
     const audioBase64 = await blobToBase64(wavBlob);
 
     const res = await fetch('/api/recognize-sound', {
@@ -100,10 +112,11 @@ recordBtn.addEventListener('click', async () => {
     if (!res.ok) throw new Error(data.error || `Request failed with ${res.status}`);
 
     renderResults(data.results);
-    setStatus('Done.');
+    setStatus('Done.', 'done');
   } catch (err) {
     console.error(err);
-    setStatus(`Error: ${err.message}`);
+    setStatus(`Error: ${err.message}`, 'error');
+    renderResultsError(err.message);
   } finally {
     recordBtn.disabled = false;
     progressWrap.hidden = true;
@@ -111,5 +124,6 @@ recordBtn.addEventListener('click', async () => {
 });
 
 setStatus(
-  `Ready. Recording captures ${RECORD_SECONDS} seconds; edit the candidate labels below before recording if you like.`
+  `Ready. Recording captures ${RECORD_SECONDS} seconds; edit the candidate labels below before recording if you like.`,
+  'idle'
 );
