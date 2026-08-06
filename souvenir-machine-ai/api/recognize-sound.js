@@ -1,7 +1,7 @@
 // Vercel serverless function. Keeps HF_TOKEN server-side only — the
-// browser posts a base64 WAV clip and label list, never the token.
+// browser posts a base64 WAV clip, never the token.
 
-import { recognizeSound, DEFAULT_LABELS } from '../lib/recognizeSound.js';
+import { recognizeSound } from '../lib/recognizeSound.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -15,16 +15,15 @@ export default async function handler(req, res) {
     return;
   }
 
-  const { audio, labels } = req.body || {};
+  const { audio } = req.body || {};
   if (!audio || typeof audio !== 'string') {
     res.status(400).json({ error: 'Missing audio (base64-encoded WAV)' });
     return;
   }
 
-  const candidateLabels = Array.isArray(labels) && labels.length >= 2 ? labels : DEFAULT_LABELS;
-
   try {
-    const results = await recognizeSound({ audioBase64: audio, candidateLabels, apiKey });
+    const audioBuffer = Buffer.from(audio, 'base64');
+    const results = await recognizeSound({ audioBuffer, apiKey });
     res.status(200).json({ results });
   } catch (err) {
     res.status(502).json({ error: err.message });

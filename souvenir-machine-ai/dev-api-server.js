@@ -6,7 +6,7 @@
 import http from 'node:http';
 import { generateImage } from './lib/generateImage.js';
 import { generateSound } from './lib/generateSound.js';
-import { recognizeSound, DEFAULT_LABELS } from './lib/recognizeSound.js';
+import { recognizeSound } from './lib/recognizeSound.js';
 
 const PORT = process.env.API_PORT || 5175;
 
@@ -53,13 +53,13 @@ const server = http.createServer(async (req, res) => {
 
   if (req.url === '/api/recognize-sound') {
     try {
-      const { audio, labels } = await readBody(req);
+      const { audio } = await readBody(req);
       const apiKey = process.env.HF_TOKEN;
       if (!apiKey) return sendJson(res, 500, { error: 'Set HF_TOKEN in your environment before running this locally.' });
       if (!audio) return sendJson(res, 400, { error: 'Missing audio (base64-encoded WAV)' });
 
-      const candidateLabels = Array.isArray(labels) && labels.length >= 2 ? labels : DEFAULT_LABELS;
-      const results = await recognizeSound({ audioBase64: audio, candidateLabels, apiKey });
+      const audioBuffer = Buffer.from(audio, 'base64');
+      const results = await recognizeSound({ audioBuffer, apiKey });
       sendJson(res, 200, { results });
     } catch (err) {
       sendJson(res, 502, { error: err.message });

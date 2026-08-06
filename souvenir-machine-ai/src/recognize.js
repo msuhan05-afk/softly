@@ -1,56 +1,26 @@
 // Orchestration for the sound-recognition page: record a short clip ->
-// encode as WAV -> POST to /api/recognize-sound -> show CLAP's scores
-// against the candidate labels. No image/sound generation here — this
-// page only classifies.
+// encode as WAV -> POST to /api/recognize-sound -> show the AudioSet
+// tagging model's top scores. No image/sound generation here — this page
+// only classifies, and (unlike the CLAP version this page used to run)
+// against a fixed vocabulary rather than user-typed labels — see
+// README.md for why.
 
 import { recordClip, blobToBase64 } from './wavRecorder.js';
 
 const RECORD_SECONDS = 6;
-
-// Keep in sync with lib/recognizeSound.js's DEFAULT_LABELS — this is just
-// the pre-filled UI value, the backend falls back to its own copy if the
-// labels field is ever missing or too short.
-const DEFAULT_LABELS = [
-  'rain',
-  'wind',
-  'birds chirping',
-  'traffic noise',
-  'human speech',
-  'music',
-  'footsteps',
-  'water or stream',
-  'crowd noise',
-  'silence',
-  'machinery or engine noise',
-  'dog barking',
-  'construction noise',
-  'keyboard typing',
-  'applause',
-  'laughter',
-];
 
 const recordBtn = document.getElementById('recordBtn');
 const statusEl = document.getElementById('status');
 const statusPill = document.getElementById('statusPill');
 const progressWrap = document.getElementById('progress');
 const progressBar = document.getElementById('progressBar');
-const labelsInput = document.getElementById('labelsInput');
 const resultsHost = document.getElementById('resultsHost');
-
-labelsInput.value = DEFAULT_LABELS.join(', ');
 
 // state: 'idle' | 'recording' | 'working' | 'done' | 'error' — drives the
 // status-pill dot color/pulse in src/style.css.
 function setStatus(text, state = 'idle') {
   statusEl.textContent = text;
   statusPill.dataset.state = state;
-}
-
-function parseLabels(raw) {
-  return raw
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
 }
 
 function renderResults(results) {
@@ -88,11 +58,6 @@ recordBtn.addEventListener('click', async () => {
     progressBar.style.width = '0%';
     resultsHost.innerHTML = '';
 
-    const labels = parseLabels(labelsInput.value);
-    if (labels.length < 2) {
-      throw new Error('Enter at least two candidate labels, comma-separated.');
-    }
-
     setStatus(`Listening… recording ${RECORD_SECONDS} seconds of sound.`, 'recording');
     const wavBlob = await recordClip(RECORD_SECONDS, {
       onProgress: (t) => {
@@ -100,13 +65,13 @@ recordBtn.addEventListener('click', async () => {
       },
     });
 
-    setStatus('Encoding clip and asking CLAP what it hears (may take a moment on a cold start)…', 'working');
+    setStatus('Encoding clip and asking the AudioSet model what it hears (may take a moment on a cold start)…', 'working');
     const audioBase64 = await blobToBase64(wavBlob);
 
     const res = await fetch('/api/recognize-sound', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ audio: audioBase64, labels }),
+      body: JSON.stringify({ audio: audioBase64 }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || `Request failed with ${res.status}`);
@@ -123,7 +88,4 @@ recordBtn.addEventListener('click', async () => {
   }
 });
 
-setStatus(
-  `Ready. Recording captures ${RECORD_SECONDS} seconds; edit the candidate labels below before recording if you like.`,
-  'idle'
-);
+setStatus(`Ready. Recording captures ${RECORD_SECONDS} seconds of sound.`, 'idle');
