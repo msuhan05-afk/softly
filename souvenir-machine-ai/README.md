@@ -103,9 +103,48 @@ features feeding a prompt template. So it gets its own capture path:
   JSON-wrapped `candidate_labels` parameter, since there's nothing to
   parameterize.
 
-`vite.config.js` lists `recognize.html` as a second Rollup entry point —
-without that, `vite build` only bundles `index.html` and this page 404s
-in production even though it works fine in dev.
+`vite.config.js` lists `recognize.html` as an additional Rollup entry
+point — without that, `vite build` only bundles `index.html` and this page
+404s in production even though it works fine in dev.
+
+## On-device recognition page (`/local.html`) — no API key
+
+The one page here that needs **no credentials at all**. Same job as
+`/recognize.html`, but the model runs entirely in the browser via
+[MediaPipe Audio Classifier](https://developers.google.com/edge/mediapipe/solutions/audio/audio_classifier)
+with YAMNet — WASM runtime plus a ~4MB on-device TFLite model, both served
+from `public/`. No API key, no serverless function, no network call at
+inference time, and the audio never leaves the machine.
+
+YAMNet scores against the same AudioSet ontology the hosted AST model
+uses, so the two recognition pages are directly comparable: same taxonomy,
+one hosted and one on-device.
+
+**This is also the only pipeline in the project verified against a real
+model rather than a mock.** Because it needs no keys, it runs end-to-end
+in a sandbox — confirmed with a headless browser and a fake mic device:
+TFLite XNNPACK delegate initialises, real category scores come back
+(Chromium's synthetic beep classifies as *Beep bleep / Ding / Sound
+effect*, as you'd hope), and a request-level assertion confirms **zero
+non-localhost requests** during inference.
+
+Setup — the model and WASM are gitignored, not committed (~24MB total),
+so fetch them once after install:
+
+```bash
+npm install
+npm run setup:local   # downloads YAMNet + copies the WASM runtime into public/
+npm run dev           # then open /local.html
+```
+
+- `scripts/fetch-mediapipe-assets.js` — the fetch/copy step above
+- `src/localClassifier.js` — loads the classifier (lazily, cached across
+  recordings), resamples to the 16kHz YAMNet expects, and averages scores
+  across MediaPipe's ~1s windows so one ranked list describes the whole
+  clip
+- `src/local.js` — page orchestration; `src/wavRecorder.js` gained a
+  `recordClipSamples()` export returning raw Float32 + sample rate, since
+  this path feeds the model directly and needs no WAV encoding
 
 ## Setup
 
@@ -171,6 +210,10 @@ in each `api/*.js` function, or gating behind auth).
 | `src/recognize.js` | Orchestration for the recognition page: record → encode → classify → render ranked scores |
 | `api/recognize-sound.js` | Vercel serverless function — calls the AST audio-classification pipeline, keeps `HF_TOKEN` server-side |
 | `lib/recognizeSound.js` | Shared AST model call, used by both the Vercel function and local dev |
+| `local.html` | The on-device (MediaPipe/YAMNet) recognition page — no API key needed |
+| `src/localClassifier.js` | Loads YAMNet in-browser, resamples to 16kHz, averages scores across windows |
+| `src/local.js` | Orchestration for the on-device page: record → classify locally → render |
+| `scripts/fetch-mediapipe-assets.js` | `npm run setup:local` — fetches the model + WASM into `public/` (both gitignored) |
 
 ## Deploying to Vercel
 
@@ -192,12 +235,16 @@ The record → aggregate → build-prompts pipeline (both generation pages)
 and the record → encode → classify pipeline (`/recognize.html`) have both
 been verified end-to-end in a headless browser with a fake mic device:
 correct prompt payloads built, all three `/api/*` requests fire with the
-right bodies. **None of the three provider calls (Hugging Face image,
-ElevenLabs sound, Hugging Face AST/AudioSet) have been tested against the
-real APIs** in this session — no valid keys were available in the build
-environment. Before relying on this, set real keys and confirm
+right bodies. **None of the three hosted provider calls (Hugging Face
+image, ElevenLabs sound, Hugging Face AST/AudioSet) have been tested
+against the real APIs** in this session — no valid keys were available in
+the build environment. Before relying on those, set real keys and confirm
 `POST /api/generate-image`, `POST /api/generate-sound`, and
 `POST /api/recognize-sound` each return usable output.
+
+The exception is **`/local.html`, which *has* been verified against the
+real model** — it needs no credentials, so it runs fully in a sandbox.
+See that section above for what was confirmed.
 
 ## Ethics note
 

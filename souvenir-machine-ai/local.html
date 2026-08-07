@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sound Recognition (AudioSet) — Souvenir Machine</title>
+    <title>On-Device Recognition (MediaPipe) — Souvenir Machine</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
@@ -14,25 +14,24 @@
       </a>
       <div class="topnav-links">
         <a href="/index.html" class="topnav-link">Generate</a>
-        <a href="/recognize.html" class="topnav-link is-active">Recognize</a>
-        <a href="/local.html" class="topnav-link">On-device</a>
+        <a href="/recognize.html" class="topnav-link">Recognize</a>
+        <a href="/local.html" class="topnav-link is-active">On-device</a>
       </div>
     </nav>
 
     <main id="app">
       <header>
-        <h1>Sound Recognition <span class="badge">AudioSet</span></h1>
+        <h1>On-Device Recognition <span class="badge">No API key</span></h1>
         <p class="subtitle">
-          Records a short clip and asks
-          <a href="https://huggingface.co/MIT/ast-finetuned-audioset-10-10-0.4593" target="_blank" rel="noopener"
-            >MIT's Audio Spectrogram Transformer</a
-          >, fine-tuned on Google's AudioSet, to tag it. Originally built
-          against
-          <a href="https://github.com/microsoft/unilm/tree/master/beats" target="_blank" rel="noopener">Microsoft's BEATs</a>
-          — swapped after finding BEATs has no hosted API and is itself a
-          fixed classifier, not zero-shot. See the README for the full story.
-          Scores are against AudioSet's ~527 fixed categories, not
-          free-typed labels.
+          Same idea as the Recognize page, but the model runs
+          <strong>entirely in your browser</strong> —
+          <a href="https://developers.google.com/edge/mediapipe/solutions/audio/audio_classifier" target="_blank" rel="noopener"
+            >MediaPipe Audio Classifier</a
+          >
+          with YAMNet, as WASM plus a ~4MB on-device model. No API key, no
+          server, no audio ever leaves your machine. Scores against the same
+          AudioSet ontology the hosted page uses, so the two are directly
+          comparable.
         </p>
       </header>
 
@@ -50,6 +49,6 @@
       </section>
     </main>
 
-    <script type="module" src="/src/recognize.js"></script>
+    <script type="module" src="/src/local.js"></script>
   </body>
 </html>

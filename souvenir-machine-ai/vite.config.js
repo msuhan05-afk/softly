@@ -15,6 +15,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         recognize: resolve(__dirname, 'recognize.html'),
+        local: resolve(__dirname, 'local.html'),
       },
     },
   },

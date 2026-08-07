@@ -1,0 +1,4 @@
+# Fetched by `npm run setup:local` (scripts/fetch-mediapipe-assets.js).
+# Kept out of git: ~4MB model + ~20MB WASM runtime, both reproducible.
+public/models/
+public/mediapipe-wasm/

@@ -1,14 +1,22 @@
-// Records a short microphone clip and encodes it as a 16-bit PCM WAV blob,
-// entirely client-side — no server round-trip, no extra library. CLAP
-// needs an actual audio waveform, not the Meyda-extracted numeric features
-// src/audio.js produces for the generation pages, so this is a separate,
-// simpler capture path used only by the recognition page.
+// Records a short microphone clip, entirely client-side — no server
+// round-trip, no extra library. The recognition pages need an actual audio
+// waveform, not the Meyda-extracted numeric features src/audio.js produces
+// for the generation pages, so this is a separate, simpler capture path.
+//
+// Two consumers with different needs:
+//   recordClip()        -> 16-bit PCM WAV blob, for the hosted AST model
+//                          on /recognize.html (posted as bytes to the API)
+//   recordClipSamples() -> raw Float32 + sampleRate, for the on-device
+//                          MediaPipe/YAMNet model on /local.html (fed
+//                          straight to the classifier, no encoding needed)
 //
 // Uses ScriptProcessorNode, which is deprecated in favor of AudioWorklet
 // but still broadly supported and far simpler to set up for a one-off
 // short clip like this.
 
-export async function recordClip(seconds, { onProgress } = {}) {
+// Shared capture core — resolves with the merged Float32 samples and the
+// AudioContext's sample rate. Both public recorders wrap this.
+async function captureSamples(seconds, { onProgress } = {}) {
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   const audioContext = new AudioContextClass();
   if (audioContext.state === 'suspended') await audioContext.resume();
@@ -40,13 +48,25 @@ export async function recordClip(seconds, { onProgress } = {}) {
           stream.getTracks().forEach((track) => track.stop());
           const sampleRate = audioContext.sampleRate;
           audioContext.close();
-          resolve(encodeWav(mergeChunks(chunks), sampleRate));
+          resolve({ samples: mergeChunks(chunks), sampleRate });
         }
       } catch (err) {
         reject(err);
       }
     };
   });
+}
+
+// Returns a 16-bit PCM WAV Blob.
+export async function recordClip(seconds, options) {
+  const { samples, sampleRate } = await captureSamples(seconds, options);
+  return encodeWav(samples, sampleRate);
+}
+
+// Returns { samples: Float32Array, sampleRate } — no encoding step, for
+// consumers that want the raw waveform (the on-device classifier).
+export async function recordClipSamples(seconds, options) {
+  return captureSamples(seconds, options);
 }
 
 function mergeChunks(chunks) {
