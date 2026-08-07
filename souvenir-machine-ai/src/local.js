@@ -87,8 +87,11 @@ recordBtn.addEventListener('click', async () => {
     setStatus('Done — classified entirely in your browser, no data sent anywhere.', 'done');
   } catch (err) {
     console.error(err);
-    setStatus(`Error: ${err.message}`, 'error');
-    renderResultsError(err.message);
+    // Not everything thrown here is an Error with a .message — see
+    // describeError() in localClassifier.js for why.
+    const message = (err instanceof Error && err.message) || String(err) || 'unknown error';
+    setStatus(`Error: ${message}`, 'error');
+    renderResultsError(message);
   } finally {
     recordBtn.disabled = false;
     progressWrap.hidden = true;

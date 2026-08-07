@@ -13,6 +13,49 @@
 
 import { AudioClassifier, FilesetResolver } from '@mediapipe/tasks-audio';
 
+const WASM_DIR = '/mediapipe-wasm';
+const MODEL_PATH = '/models/yamnet.tflite';
+
+const SETUP_HINT =
+  'the on-device assets are missing. Run `npm run setup:local` in souvenir-machine-ai/, then reload. ' +
+  '(They are gitignored — ~24MB of model + WASM — so a fresh clone has to fetch them once.)';
+
+// MediaPipe rejects with a bare Event or a string in some failure paths,
+// not an Error, so `err.message` can be undefined — which previously
+// surfaced to the user as the useless "Error: undefined". Always produce
+// something readable.
+function describeError(err) {
+  if (err instanceof Error && err.message) return err.message;
+  if (typeof err === 'string' && err) return err;
+  if (err instanceof Event) return `failed to load ${err.target?.src || 'a required asset'}`;
+  return 'unknown error while loading the on-device model';
+}
+
+// The assets are gitignored and fetched by `npm run setup:local`, so the
+// single most likely failure is that step not having been run. Check for
+// it up front and say so plainly, rather than letting MediaPipe fail deep
+// inside its loader with an opaque message.
+async function assertAssetsPresent() {
+  const checks = await Promise.all(
+    [`${WASM_DIR}/audio_wasm_internal.js`, MODEL_PATH].map(async (url) => {
+      try {
+        const res = await fetch(url, { method: 'HEAD' });
+        if (!res.ok) return false;
+        // A plain !res.ok check isn't enough: Vite's dev server answers
+        // unknown paths with the SPA fallback (200 + text/html), so a
+        // missing asset still looks like a hit. Treat an HTML response as
+        // "not actually there".
+        return !(res.headers.get('content-type') || '').includes('text/html');
+      } catch {
+        return false;
+      }
+    })
+  );
+  if (checks.some((ok) => !ok)) {
+    throw new Error(SETUP_HINT);
+  }
+}
+
 let classifierPromise = null;
 
 // Lazily created and cached — loading the WASM runtime and model takes a
@@ -20,11 +63,16 @@ let classifierPromise = null;
 export function getClassifier() {
   if (!classifierPromise) {
     classifierPromise = (async () => {
-      const fileset = await FilesetResolver.forAudioTasks('/mediapipe-wasm');
-      return AudioClassifier.createFromOptions(fileset, {
-        baseOptions: { modelAssetPath: '/models/yamnet.tflite' },
-        maxResults: 8,
-      });
+      await assertAssetsPresent();
+      try {
+        const fileset = await FilesetResolver.forAudioTasks(WASM_DIR);
+        return await AudioClassifier.createFromOptions(fileset, {
+          baseOptions: { modelAssetPath: MODEL_PATH },
+          maxResults: 8,
+        });
+      } catch (err) {
+        throw new Error(`could not initialise the on-device model — ${describeError(err)}`);
+      }
     })().catch((err) => {
       // Don't cache a failed init — let the next attempt retry cleanly.
       classifierPromise = null;

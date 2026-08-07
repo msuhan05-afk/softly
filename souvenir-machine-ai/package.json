@@ -7,6 +7,7 @@
     "dev": "vite",
     "dev:api": "node dev-api-server.js",
     "setup:local": "node scripts/fetch-mediapipe-assets.js",
+    "postinstall": "node scripts/fetch-mediapipe-assets.js || true",
     "build": "vite build",
     "preview": "vite preview"
   },

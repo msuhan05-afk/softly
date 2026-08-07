@@ -129,13 +129,18 @@ effect*, as you'd hope), and a request-level assertion confirms **zero
 non-localhost requests** during inference.
 
 Setup — the model and WASM are gitignored, not committed (~24MB total),
-so fetch them once after install:
+but a `postinstall` hook fetches them automatically:
 
 ```bash
-npm install
-npm run setup:local   # downloads YAMNet + copies the WASM runtime into public/
-npm run dev           # then open /local.html
+npm install    # also fetches YAMNet + copies the WASM runtime into public/
+npm run dev    # then open /local.html
 ```
+
+If the postinstall step was skipped (offline install, `--ignore-scripts`),
+run `npm run setup:local` to fetch them explicitly. The page detects
+missing assets up front and says exactly that, rather than failing deep
+inside MediaPipe's loader — that path is deliberately tested, since the
+assets not being committed makes it the most likely first-run problem.
 
 - `scripts/fetch-mediapipe-assets.js` — the fetch/copy step above
 - `src/localClassifier.js` — loads the classifier (lazily, cached across
@@ -213,7 +218,7 @@ in each `api/*.js` function, or gating behind auth).
 | `local.html` | The on-device (MediaPipe/YAMNet) recognition page — no API key needed |
 | `src/localClassifier.js` | Loads YAMNet in-browser, resamples to 16kHz, averages scores across windows |
 | `src/local.js` | Orchestration for the on-device page: record → classify locally → render |
-| `scripts/fetch-mediapipe-assets.js` | `npm run setup:local` — fetches the model + WASM into `public/` (both gitignored) |
+| `scripts/fetch-mediapipe-assets.js` | Fetches the model + WASM into `public/` (both gitignored); runs automatically via `postinstall`, or manually via `npm run setup:local` |
 
 ## Deploying to Vercel
 
