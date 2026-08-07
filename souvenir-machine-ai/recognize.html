@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sound Recognition (AudioSet) — Souvenir Machine</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <nav class="topnav">
+      <a class="brand" href="/index.html">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        Souvenir Machine
+      </a>
+      <div class="topnav-links">
+        <a href="/index.html" class="topnav-link">Generate</a>
+        <a href="/recognize.html" class="topnav-link is-active">Recognize</a>
+        <a href="/local.html" class="topnav-link">On-device</a>
+      </div>
+    </nav>
+
+    <main id="app">
+      <header>
+        <h1>Sound Recognition <span class="badge">AudioSet</span></h1>
+        <p class="subtitle">
+          Records a short clip and asks
+          <a href="https://huggingface.co/MIT/ast-finetuned-audioset-10-10-0.4593" target="_blank" rel="noopener"
+            >MIT's Audio Spectrogram Transformer</a
+          >, fine-tuned on Google's AudioSet, to tag it. Originally built
+          against
+          <a href="https://github.com/microsoft/unilm/tree/master/beats" target="_blank" rel="noopener">Microsoft's BEATs</a>
+          — swapped after finding BEATs has no hosted API and is itself a
+          fixed classifier, not zero-shot. See the README for the full story.
+          Scores are against AudioSet's ~527 fixed categories, not
+          free-typed labels.
+        </p>
+      </header>
+
+      <section id="controls" class="card">
+        <button id="recordBtn" class="btn-primary">🎙️ Record 6s clip &amp; identify</button>
+        <div id="progress" class="progress" hidden><div id="progressBar"></div></div>
+        <div class="status-pill" id="statusPill" data-state="idle">
+          <span class="status-dot"></span>
+          <span id="status" role="status"></span>
+        </div>
+      </section>
+
+      <section id="resultsHost" class="card">
+        <p class="placeholder">No clip recorded yet.</p>
+      </section>
+    </main>
+
+    <script type="module" src="/src/recognize.js"></script>
+  </body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Souvenir Machine (AI) — Audio-to-Image via Generative Model</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <nav class="topnav">
+      <a class="brand" href="/index.html">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        Souvenir Machine
+      </a>
+      <div class="topnav-links">
+        <a href="/index.html" class="topnav-link is-active">Generate</a>
+        <a href="/recognize.html" class="topnav-link">Recognize</a>
+        <a href="/local.html" class="topnav-link">On-device</a>
+      </div>
+    </nav>
+
+    <main id="app">
+      <header>
+        <h1>Image + Ambience <span class="badge">AI version</span></h1>
+        <p class="subtitle">
+          Same 30-second audio capture as the no-ML engine, but the final
+          image and a companion generated ambience both come from AI
+          models instead of a hand-written renderer. See the README for
+          how this differs from <code>souvenir-machine/</code>.
+        </p>
+      </header>
+
+      <section id="controls" class="card">
+        <button id="recordBtn" class="btn-primary">🎙️ Start 30s recording</button>
+        <div id="progress" class="progress" hidden><div id="progressBar"></div></div>
+        <div class="status-pill" id="statusPill" data-state="idle">
+          <span class="status-dot"></span>
+          <span id="status" role="status"></span>
+        </div>
+      </section>
+
+      <section id="result" class="result-grid">
+        <div class="card result-card">
+          <h2 class="card-title">Image</h2>
+          <div id="imageHost" class="card-body">
+            <p class="placeholder">Nothing generated yet.</p>
+          </div>
+        </div>
+        <div class="card result-card">
+          <h2 class="card-title">Ambience</h2>
+          <div id="soundHost" class="card-body">
+            <p class="placeholder">Nothing generated yet.</p>
+          </div>
+        </div>
+      </section>
+
+      <aside id="promptPanel" class="prompt-panel card" hidden></aside>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

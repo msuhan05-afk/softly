@@ -1,0 +1,21 @@
+{
+  "name": "souvenir-machine-ai",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:api": "node dev-api-server.js",
+    "setup:local": "node scripts/fetch-mediapipe-assets.js",
+    "postinstall": "node scripts/fetch-mediapipe-assets.js || true",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-audio": "^1.0.1",
+    "meyda": "^5.6.3"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
+  }
+}
